@@ -46,7 +46,7 @@ jobs:
       uses: sualeh/build-maven-dependency@v1.0.8
       with:
         repository: schemacrawler/SchemaCrawler-Core
-        artifact: us.fatehi:schemacrawler:17.11.0
+        artifact: us.fatehi:schemacrawler:17.11.2
 
 # BUILD FOR DISTRIBUTION
     - id: build
@@ -84,15 +84,15 @@ jobs:
           SchemaCrawler early access release at last commit ${{ github.sha }}
         generate_release_notes: true
         files: |
-          ./schemacrawler-distrib/target/schemacrawler-17.11.0-bin.zip
-          ./schemacrawler-distrib/target/schemacrawler-17.11.0-bin.zip.SHA-512
+          ./schemacrawler-distrib/target/schemacrawler-17.11.2-bin.zip
+          ./schemacrawler-distrib/target/schemacrawler-17.11.2-bin.zip.SHA-512
         overwrite_files: true
 
 # MOVE GITHUB TAG
     - id: install-gitsign
       name: Install gitsign for commit signing
       # See https://github.com/chainguard-dev/actions/blob/main/setup-gitsign/action.yml
-      uses: chainguard-dev/actions/setup-gitsign@0cba302c40fce067ec0d39f1d91b10580d4b06b0
+      uses: chainguard-dev/actions/setup-gitsign@c69a264ec2a5934c3186c618f368fc1c86f16cff
     - id: move-tag
       name: Move early-access-release tag
       env:

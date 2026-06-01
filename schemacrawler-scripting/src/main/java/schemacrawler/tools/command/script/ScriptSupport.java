@@ -12,11 +12,19 @@ import static java.util.stream.Collectors.toList;
 import static schemacrawler.ermodel.model.RelationshipCardinality.many_many;
 import static schemacrawler.ermodel.model.RelationshipCardinality.one_many;
 import static schemacrawler.ermodel.model.RelationshipCardinality.zero_many;
+import static schemacrawler.utility.MetaDataUtility.getSimpleTypeName;
+import static schemacrawler.utility.MetaDataUtility.isPartial;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import schemacrawler.ermodel.model.ERModel;
+import schemacrawler.ermodel.model.Entity;
 import schemacrawler.ermodel.model.Relationship;
 import schemacrawler.ermodel.model.RelationshipCardinality;
 import schemacrawler.ermodel.utility.ERModelUtility;
@@ -33,9 +41,14 @@ import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.PrimaryKey;
 import schemacrawler.schema.Table;
 import schemacrawler.schema.TableReference;
+import schemacrawler.tools.state.AbstractExecutionState;
 import schemacrawler.utility.MetaDataUtility;
+import schemacrawler.utility.MetaDataUtility.SimpleDatabaseObjectType;
+import us.fatehi.utility.string.StringFormat;
 
-public final class ScriptSupport {
+public final class ScriptSupport extends AbstractExecutionState {
+
+  private static final Logger LOGGER = Logger.getLogger(CommandChain.class.getName());
 
   private final Identifiers quotedIdentifiers;
 
@@ -119,6 +132,28 @@ public final class ScriptSupport {
       return "";
     }
     return column.getColumnDataType().getName();
+  }
+
+  public Collection<Entity> entities() {
+    if (!hasERModel()) {
+      return List.of();
+    }
+    final ERModel erModel = getERModel();
+    final List<Entity> allEntities = new ArrayList<>(erModel.getEntities());
+    for (final Table table : erModel.getUnmodeledTables()) {
+      if (isPartial(table) || getSimpleTypeName(table) == SimpleDatabaseObjectType.view) {
+        LOGGER.log(Level.FINE, new StringFormat("Excluding table <%s>", table));
+        continue;
+      }
+      final Optional<Entity> optionalEntity = erModel.lookupEntity(table);
+      if (optionalEntity.isEmpty()) {
+        LOGGER.log(Level.FINE, new StringFormat("Entity not found for table <%s>", table));
+        continue;
+      }
+      final Entity entity = optionalEntity.get();
+      allEntities.add(entity);
+    }
+    return List.copyOf(allEntities);
   }
 
   public String fkColumns(final ForeignKey foreignKey) {

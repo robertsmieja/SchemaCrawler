@@ -7,7 +7,7 @@
   <parent>
     <groupId>us.fatehi</groupId>
     <artifactId>schemacrawler-parent</artifactId>
-    <version>17.11.0</version>
+    <version>17.11.2</version>
     <relativePath>../schemacrawler-parent/pom.xml</relativePath>
   </parent>
   <artifactId>schemacrawler-dbtest</artifactId>
@@ -200,7 +200,7 @@
     <dependency>
       <groupId>org.apache.calcite.avatica</groupId>
       <artifactId>avatica-core</artifactId>
-      <version>1.27.0</version>
+      <version>1.28.0</version>
       <scope>test</scope>
       <exclusions>
         <exclusion>
